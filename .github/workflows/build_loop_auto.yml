@@ -5,13 +5,13 @@ on:
   schedule:
     # Check for updates every Sunday
     #   Later logic builds if there are updates or if it is the 2nd Sunday of the month
-    - cron: "33 7 * * 0" # Sunday at UTC 7:33
+    - cron: "0 12 * * *" # Sunday at UTC 7:33
 
 env:
   GH_PAT: ${{ secrets.GH_PAT }}
   UPSTREAM_REPO: LoopKit/LoopWorkspace
-  UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (replace with specific branch name if needed)
-  TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync
+  UPSTREAM_BRANCH: main
+  TARGET_BRANCH: main
 
 jobs:
   # use a single runner for these sequential steps
@@ -108,6 +108,16 @@ jobs:
           upstream_sync_branch: ${{ env.UPSTREAM_BRANCH }}
           upstream_sync_repo: ${{ env.UPSTREAM_REPO }}
 
+      - name: Debug sync result
+        run: |
+          echo "has_new_commits=${{ steps.sync.outputs.has_new_commits }}"
+          echo "github.ref=${{ github.ref }}"
+          echo "github.ref_name=${{ github.ref_name }}"
+          echo "github.event_name=${{ github.event_name }}"
+          echo "upstream=${{ env.UPSTREAM_REPO }}"
+          echo "upstream_branch=${{ env.UPSTREAM_BRANCH }}"
+          echo "target_branch=${{ env.TARGET_BRANCH }}"
+          
       # Display a sample message based on the sync output var 'has_new_commits'
       - name: New commits found
         if: |
